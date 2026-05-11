@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>書斎 — Anime Study Room</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600;700&family=Noto+Sans+JP:wght@300;400;500&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a0a0a;
+    --ink-light: #2d1a1a;
+    --parchment: #fdf6ec;
+    --parchment-dark: #f5e8d0;
+    --sakura: #e8a0b4;
+    --sakura-light: #f5cdd8;
+    --sakura-deep: #c0607a;
+    --gold: #c9963a;
+    --gold-light: #e8c070;
+    --matcha: #5a7a4a;
+    --shadow: rgba(26,10,10,0.15);
+    --red-seal: #9b2335;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--parchment);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='3' fill='%23c9963a'/%3E%3C/svg%3E") 10 10, auto;
+  }
+
+  /* === SAKURA BACKGROUND === */
+  .sakura-bg {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse at 15% 20%, rgba(232,160,180,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 70%, rgba(232,160,180,0.1) 0%, transparent 45%),
+      radial-gradient(ellipse at 50% 100%, rgba(201,150,58,0.06) 0%, transparent 60%);
+  }
+
+  /* Paper texture overlay */
+  .paper-texture {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 30px, rgba(26,10,10,0.015) 30px, rgba(26,10,10,0.015) 31px),
+      repeating-linear-gradient(90deg, transparent, transparent 30px, rgba(26,10,10,0.008) 30px, rgba(26,10,10,0.008) 31px);
+  }
+
+  /* Falling petals */
+  .petals-container {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+  }
+
+  .petal {
+    position: absolute;
+    top: -30px;
+    font-size: 14px;
+    animation: fall linear infinite;
+    opacity: 0.6;
+    color: var(--sakura);
+  }
+
+  @keyframes fall {
+    0%   { transform: translateY(-30px) rotate(0deg) translateX(0); opacity: 0; }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.4; }
+    100% { transform: translateY(110vh) rotate(720deg) translateX(60px); opacity: 0; }
+  }
+
+  /* === LAYOUT === */
+  .main-wrapper {
+    position: relative; z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+
+  /* === HEADER === */
+  header {
+    padding: 40px 0 24px;
+    text-align: center;
+    position: relative;
+  }
+
+  .header-deco {
+    position: absolute; top: 50px; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .header-kanji {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--sakura-deep);
+    letter-spacing: 8px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 38px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 4px;
+    position: relative;
+  }
+
+  header h1 span {
+    color: var(--sakura-deep);
+  }
+
+  .header-sub {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--gold);
+    letter-spacing: 6px;
+    margin-top: 8px;
+    display: block;
+  }
+
+  .seal {
+    display: inline-block;
+    margin-top: 20px;
+    width: 44px; height: 44px;
+    border: 2px solid var(--red-seal);
+    border-radius: 4px;
+    color: var(--red-seal);
+    font-family: 'Noto Serif JP', serif;
+    font-size: 18px;
+    line-height: 40px;
+    opacity: 0.85;
+    transform: rotate(-5deg);
+  }
+
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin: 28px 0 0;
+    flex-wrap: wrap;
+  }
+
+  nav button {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    padding: 8px 22px;
+    border: 1px solid var(--sakura);
+    background: transparent;
+    color: var(--ink-light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+
+  nav button:hover, nav button.active {
+    background: var(--sakura-light);
+    border-color: var(--sakura-deep);
+    color: var(--ink);
+  }
+
+  /* === SECTIONS === */
+  .section { display: none; }
+  .section.active { display: block; animation: fadeIn 0.5s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--gold);
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    text-align: center;
+    margin: 40px 0 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .section-title::before, .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+  }
+
+  /* === TIMER SECTION === */
+  .timer-card {
+    background: rgba(253,246,236,0.9);
+    border: 1px solid var(--sakura-light);
+    border-radius: 2px;
+    padding: 48px 40px;
+    text-align: center;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+    box-shadow: 4px 4px 0 rgba(232,160,180,0.2);
+  }
+
+  .timer-card::before {
+    content: '集中';
+    position: absolute;
+    top: -1px; right: 20px;
+    background: var(--sakura-deep);
+    color: var(--parchment);
+    font-family: 'Noto Serif JP', serif;
+    font-size: 11px;
+    padding: 3px 10px;
+    letter-spacing: 2px;
+  }
+
+  .timer-mode {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 32px;
+  }
+
+  .timer-mode button {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 7px 18px;
+    border: 1px solid var(--sakura);
+    background: transparent;
+    color: var(--ink-light);
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+
+  .timer-mode button.active {
+    background: var(--sakura-deep);
+    color: var(--parchment);
+    border-color: var(--sakura-deep);
+  }
+
+  .timer-display {
+    font-family: 'Cinzel', serif;
+    font-size: 80px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 8px;
+    letter-spacing: 4px;
+  }
+
+  .timer-label {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 4px;
+    margin-bottom: 36px;
+  }
+
+  .timer-controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .btn-main {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    padding: 12px 40px;
+    background: var(--ink);
+    color: var(--parchment);
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .btn-main:hover { background: var(--red-seal); }
+
+  .btn-sec {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    padding: 12px 24px;
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--sakura);
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+
+  .btn-sec:hover { background: var(--sakura-light); }
+
+  .session-log {
+    margin-top: 28px;
+    font-size: 12px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    font-family: 'Noto Serif JP', serif;
+  }
+
+  /* === PROGRESS RING === */
+  .timer-ring-wrap {
+    position: relative; display: inline-block; margin-bottom: 16px;
+  }
+
+  .timer-ring-wrap svg {
+    transform: rotate(-90deg);
+  }
+
+  .timer-ring-inner {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+  }
+
+  /* === TASKS SECTION === */
+  .tasks-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  @media (max-width: 650px) { .tasks-grid { grid-template-columns: 1fr; } }
+
+  .task-panel {
+    background: rgba(253,246,236,0.9);
+    border: 1px solid var(--sakura-light);
+    border-radius: 2px;
+    padding: 28px 28px 20px;
+    box-shadow: 3px 3px 0 rgba(201,150,58,0.1);
+    position: relative;
+  }
+
+  .task-panel-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: var(--sakura-deep);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .task-panel-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--sakura-light);
+  }
+
+  .task-add {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .task-input {
+    flex: 1;
+    padding: 9px 14px;
+    border: 1px solid var(--sakura-light);
+    background: var(--parchment);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    color: var(--ink);
+    outline: none;
+    border-radius: 1px;
+  }
+
+  .task-input:focus { border-color: var(--sakura-deep); }
+
+  .task-input::placeholder { color: var(--sakura); }
+
+  .task-add-btn {
+    padding: 9px 16px;
+    background: var(--sakura-deep);
+    color: var(--parchment);
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    transition: background 0.2s;
+    border-radius: 1px;
+  }
+
+  .task-add-btn:hover { background: var(--red-seal); }
+
+  .task-list {
+    list-style: none;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+
+  .task-list::-webkit-scrollbar { width: 3px; }
+  .task-list::-webkit-scrollbar-track { background: transparent; }
+  .task-list::-webkit-scrollbar-thumb { background: var(--sakura); }
+
+  .task-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(232,160,180,0.2);
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .task-item.done .task-text {
+    text-decoration: line-through;
+    color: var(--sakura);
+  }
+
+  .task-check {
+    width: 16px; height: 16px;
+    border: 1px solid var(--sakura);
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    color: var(--sakura-deep);
+    transition: all 0.2s;
+  }
+
+  .task-check:hover { border-color: var(--sakura-deep); background: var(--sakura-light); }
+  .task-item.done .task-check { background: var(--sakura-deep); border-color: var(--sakura-deep); color: white; }
+
+  .task-text {
+    flex: 1;
+    font-size: 13px;
+    color: var(--ink);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+  }
+
+  .task-del {
+    background: none; border: none;
+    color: var(--sakura-light);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 4px;
+    transition: color 0.2s;
+  }
+
+  .task-del:hover { color: var(--red-seal); }
+
+  /* Priority badge */
+  .priority {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 1px;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+
+  .priority.high { background: rgba(155,35,53,0.1); color: var(--red-seal); border: 1px solid rgba(155,35,53,0.2); }
+  .priority.med  { background: rgba(201,150,58,0.1); color: var(--gold);     border: 1px solid rgba(201,150,58,0.2); }
+  .priority.low  { background: rgba(90,122,74,0.1);  color: var(--matcha);   border: 1px solid rgba(90,122,74,0.2);  }
+
+  /* Stats mini */
+  .stats-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .stat-pill {
+    flex: 1;
+    background: var(--parchment-dark);
+    padding: 10px 12px;
+    text-align: center;
+    border: 1px solid var(--sakura-light);
+  }
+
+  .stat-pill .num {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    color: var(--sakura-deep);
+    display: block;
+  }
+
+  .stat-pill .lbl {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    display: block;
+    margin-top: 2px;
+  }
+
+  /* === NOTES SECTION === */
+  .notes-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 650px) { .notes-layout { grid-template-columns: 1fr; } }
+
+  .notes-sidebar {
+    background: rgba(253,246,236,0.9);
+    border: 1px solid var(--sakura-light);
+    padding: 20px 16px;
+    box-shadow: 3px 3px 0 rgba(201,150,58,0.1);
+  }
+
+  .notes-list-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .new-note-btn {
+    background: var(--sakura-deep);
+    color: var(--parchment);
+    border: none;
+    cursor: pointer;
+    width: 24px; height: 24px;
+    font-size: 16px;
+    line-height: 24px;
+    text-align: center;
+    transition: background 0.2s;
+  }
+
+  .new-note-btn:hover { background: var(--red-seal); }
+
+  .note-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    margin-bottom: 4px;
+    transition: all 0.2s;
+    border-radius: 1px;
+  }
+
+  .note-item:hover { background: var(--sakura-light); }
+  .note-item.active { border-left-color: var(--sakura-deep); background: var(--sakura-light); }
+
+  .note-item-title {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .note-item-date {
+    font-size: 10px;
+    color: var(--gold);
+    font-family: 'Noto Serif JP', serif;
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  .notes-editor-wrap {
+    background: rgba(253,246,236,0.9);
+    border: 1px solid var(--sakura-light);
+    padding: 24px 28px;
+    box-shadow: 3px 3px 0 rgba(201,150,58,0.1);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .note-title-input {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ink);
+    border: none;
+    background: transparent;
+    outline: none;
+    border-bottom: 1px solid var(--sakura-light);
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    width: 100%;
+  }
+
+  .note-title-input::placeholder { color: var(--sakura); }
+
+  .note-body-input {
+    flex: 1;
+    min-height: 280px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.9;
+    color: var(--ink);
+    border: none;
+    background: transparent;
+    outline: none;
+    resize: none;
+    width: 100%;
+  }
+
+  .note-body-input::placeholder { color: var(--sakura-light); }
+
+  .note-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--sakura-light);
+  }
+
+  .tag-input {
+    flex: 1;
+    padding: 7px 12px;
+    border: 1px solid var(--sakura-light);
+    background: var(--parchment);
+    font-size: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--ink);
+    outline: none;
+  }
+
+  .tag-input:focus { border-color: var(--sakura-deep); }
+
+  /* === MUSIC SECTION === */
+  .music-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .music-card {
+    background: rgba(253,246,236,0.9);
+    border: 1px solid var(--sakura-light);
+    padding: 24px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    box-shadow: 3px 3px 0 rgba(201,150,58,0.08);
+  }
+
+  .music-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--sakura-light);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .music-card:hover::after { opacity: 0.3; }
+  .music-card.playing { border-color: var(--sakura-deep); }
+  .music-card.playing::before {
+    content: '▶';
+    position: absolute;
+    top: 8px; right: 12px;
+    font-size: 9px;
+    color: var(--sakura-deep);
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .music-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    display: block;
+    position: relative; z-index: 1;
+  }
+
+  .music-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--ink);
+    margin-bottom: 4px;
+    position: relative; z-index: 1;
+  }
+
+  .music-sub {
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 1px;
+    position: relative; z-index: 1;
+  }
+
+  .ambient-player {
+    background: rgba(253,246,236,0.9);
+    border: 1px solid var(--sakura-light);
+    padding: 24px 32px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    box-shadow: 3px 3px 0 rgba(201,150,58,0.08);
+  }
+
+  .ambient-now {
+    flex: 1;
+  }
+
+  .ambient-name {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 15px;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .ambient-type {
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 3px;
+  }
+
+  .volume-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .volume-label {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    white-space: nowrap;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--sakura-deep) 0%, var(--sakura-light) 0%);
+    outline: none;
+    border-radius: 1px;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px; height: 12px;
+    background: var(--sakura-deep);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  /* === SCHEDULE SECTION === */
+  .schedule-wrap {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+  }
+
+  @media (max-width: 700px) { .schedule-wrap { grid-template-columns: 1fr; } }
+
+  .calendar-panel {
+    background: rgba(253,246,236,0.9);
+    border: 1px solid var(--sakura-light);
+    padding: 28px;
+    box-shadow: 3px 3px 0 rgba(201,150,58,0.1);
+  }
+
+  .cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .cal-nav {
+    background: none; border: none;
+    color: var(--sakura-deep);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 8px;
+    transition: color 0.2s;
+  }
+
+  .cal-nav:hover { color: var(--red-seal); }
+
+  .cal-month {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 16px;
+    letter-spacing: 4px;
+    color: var(--ink);
+  }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .cal-day-name {
+    text-align: center;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    padding-bottom: 8px;
+  }
+
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all 0.2s;
+    color: var(--ink);
+    position: relative;
+  }
+
+  .cal-day:hover { background: var(--sakura-light); }
+
+  .cal-day.today {
+    background: var(--sakura-deep);
+    color: var(--parchment);
+  }
+
+  .cal-day.has-event::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+
+  .cal-day.other-month { color: var(--sakura-light); cursor: default; }
+
+  .events-panel {
+    background: rgba(253,246,236,0.9);
+    border: 1px solid var(--sakura-light);
+    padding: 24px 20px;
+    box-shadow: 3px 3px 0 rgba(201,150,58,0.1);
+  }
+
+  .events-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: var(--sakura-deep);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--sakura-light);
+  }
+
+  .event-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(232,160,180,0.15);
+    animation: slideIn 0.3s ease;
+  }
+
+  .event-time {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    color: var(--gold);
+    min-width: 44px;
+    padding-top: 1px;
+  }
+
+  .event-info {}
+
+  .event-name {
+    font-size: 13px;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  .event-subj {
+    font-size: 11px;
+    color: var(--sakura-deep);
+    letter-spacing: 1px;
+  }
+
+  .event-dot {
+    width: 3px;
+    align-self: stretch;
+    flex-shrink: 0;
+    border-radius: 2px;
+  }
+
+  .add-event-form {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .add-event-form input, .add-event-form select {
+    padding: 8px 12px;
+    border: 1px solid var(--sakura-light);
+    background: var(--parchment);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    color: var(--ink);
+    outline: none;
+    width: 100%;
+  }
+
+  .add-event-form input:focus { border-color: var(--sakura-deep); }
+
+  /* === FOOTER === */
+  footer {
+    text-align: center;
+    padding: 32px 0 16px;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 11px;
+    color: var(--sakura);
+    letter-spacing: 3px;
+    border-top: 1px solid rgba(232,160,180,0.2);
+    margin-top: 40px;
+  }
+
+  /* === AMBIENT SOUND VISUAL === */
+  .sound-wave {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 24px;
+  }
+
+  .wave-bar {
+    width: 3px;
+    background: var(--sakura);
+    border-radius: 2px;
+    animation: wave 1.2s ease-in-out infinite;
+  }
+
+  .wave-bar:nth-child(1) { height: 8px;  animation-delay: 0s; }
+  .wave-bar:nth-child(2) { height: 16px; animation-delay: 0.1s; }
+  .wave-bar:nth-child(3) { height: 24px; animation-delay: 0.2s; }
+  .wave-bar:nth-child(4) { height: 14px; animation-delay: 0.3s; }
+  .wave-bar:nth-child(5) { height: 20px; animation-delay: 0.15s; }
+  .wave-bar:nth-child(6) { height: 10px; animation-delay: 0.25s; }
+
+  @keyframes wave {
+    0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
+    50%       { transform: scaleY(1);   opacity: 1; }
+  }
+
+  .sound-wave.paused .wave-bar { animation-play-state: paused; }
+
+  /* === QUOTE BANNER === */
+  .quote-banner {
+    background: linear-gradient(135deg, rgba(232,160,180,0.12) 0%, rgba(201,150,58,0.08) 100%);
+    border: 1px solid rgba(232,160,180,0.3);
+    border-left: 3px solid var(--sakura-deep);
+    padding: 20px 28px;
+    margin: 32px 0 0;
+    text-align: center;
+  }
+
+  .quote-text {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--ink);
+    letter-spacing: 2px;
+    font-style: italic;
+    line-height: 1.7;
+  }
+
+  .quote-author {
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 4px;
+    margin-top: 8px;
+    font-family: 'Noto Serif JP', serif;
+  }
+</style>
+</head>
+<body>
+
+<div class="sakura-bg"></div>
+<div class="paper-texture"></div>
+<div class="petals-container" id="petals"></div>
+
+<div class="main-wrapper">
+
+  <header>
+    <span class="header-kanji">書斎へ ようこそ</span>
+    <h1>SHOSAI <span>書斎</span></h1>
+    <span class="header-sub">anime study room</span>
+    <br>
+    <div class="seal">道</div>
+  </header>
+
+  <nav id="mainNav">
+    <button class="active" onclick="showSection('timer', this)">⏱ 集中 TIMER</button>
+    <button onclick="showSection('tasks', this)">📜 課題 TASKS</button>
+    <button onclick="showSection('notes', this)">🖊 ノート NOTES</button>
+    <button onclick="showSection('music', this)">🎵 音楽 MUSIC</button>
+    <button onclick="showSection('schedule', this)">🌸 予定 SCHEDULE</button>
+  </nav>
+
+  <!-- ===== TIMER SECTION ===== -->
+  <div id="timer" class="section active">
+    <div class="section-title">集中タイマー · FOCUS TIMER</div>
+
+    <div class="timer-card">
+      <div class="timer-mode">
+        <button class="active" onclick="setTimerMode(25,5,'作業','Work',this)">作業 25</button>
+        <button onclick="setTimerMode(10,5,'小休憩','Short Break',this)">小休憩 10</button>
+        <button onclick="setTimerMode(15,5,'大休憩','Long Break',this)">大休憩 15</button>
+      </div>
+
+      <div class="timer-ring-wrap">
+        <svg width="200" height="200" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="88" fill="none" stroke="rgba(232,160,180,0.2)" stroke-width="2"/>
+          <circle id="ringProgress" cx="100" cy="100" r="88" fill="none" stroke="#c0607a" stroke-width="2"
+            stroke-dasharray="553" stroke-dashoffset="0" stroke-linecap="round"/>
+        </svg>
+        <div class="timer-ring-inner">
+          <div class="timer-display" id="timerDisplay">25:00</div>
+          <div class="timer-label" id="timerLabel">作業時間 · FOCUS</div>
+        </div>
+      </div>
+
+      <div class="timer-controls">
+        <button class="btn-main" id="startBtn" onclick="toggleTimer()">START</button>
+        <button class="btn-sec" onclick="resetTimer()">RESET</button>
+      </div>
+
+      <div class="session-log" id="sessionLog">本日の作業 · 0 セッション完了</div>
+    </div>
+
+    <div class="quote-banner">
+      <div class="quote-text" id="quoteText">"七転び八起き — Fall seven times, stand up eight."</div>
+      <div class="quote-author">— 日本のことわざ · Japanese Proverb</div>
+    </div>
+  </div>
+
+  <!-- ===== TASKS SECTION ===== -->
+  <div id="tasks" class="section">
+    <div class="section-title">課題リスト · TASK LIST</div>
+
+    <div class="tasks-grid">
+      <div class="task-panel">
+        <div class="task-panel-title">📚 今日の課題 · TODAY</div>
+        <div class="task-add">
+          <input class="task-input" id="newTask" placeholder="新しい課題を追加..." onkeydown="if(event.key==='Enter')addTask()">
+          <select id="taskPriority" style="padding:9px 10px; border:1px solid var(--sakura-light); background:var(--parchment); font-family:'Noto Sans JP',sans-serif; font-size:12px; color:var(--ink); outline:none; border-radius:1px;">
+            <option value="high">高</option>
+            <option value="med" selected>中</option>
+            <option value="low">低</option>
+          </select>
+          <button class="task-add-btn" onclick="addTask()">+</button>
+        </div>
+        <ul class="task-list" id="taskList"></ul>
+      </div>
+
+      <div class="task-panel">
+        <div class="task-panel-title">✨ 進捗 · PROGRESS</div>
+        <div class="stats-row">
+          <div class="stat-pill">
+            <span class="num" id="statTotal">0</span>
+            <span class="lbl">TOTAL</span>
+          </div>
+          <div class="stat-pill">
+            <span class="num" id="statDone">0</span>
+            <span class="lbl">DONE</span>
+          </div>
+          <div class="stat-pill">
+            <span class="num" id="statPct">0%</span>
+            <span class="lbl">率 RATE</span>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;">
+          <div style="font-family:'Noto Serif JP',serif;font-size:11px;color:var(--gold);letter-spacing:3px;margin-bottom:10px;">完了タスク · COMPLETED</div>
+          <ul class="task-list" id="doneList" style="max-height:190px;"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== NOTES SECTION ===== -->
+  <div id="notes" class="section">
+    <div class="section-title">学習ノート · STUDY NOTES</div>
+
+    <div class="notes-layout">
+      <div class="notes-sidebar">
+        <div class="notes-list-title">
+          <span>ノート一覧</span>
+          <button class="new-note-btn" onclick="newNote()" title="新しいノート">+</button>
+        </div>
+        <div id="notesList"></div>
+      </div>
+
+      <div class="notes-editor-wrap">
+        <input class="note-title-input" id="noteTitleInput" placeholder="ノートのタイトル..." oninput="saveCurrentNote()">
+        <textarea class="note-body-input" id="noteBodyInput" placeholder="ここに学習内容を書き留めて... 
+例: 今日の授業ノート, 覚えるべき単語, 問題の解き方..." oninput="saveCurrentNote()"></textarea>
+        <div class="note-actions">
+          <input class="tag-input" id="noteTagInput" placeholder="タグを追加 (例: 数学, 英語)..." oninput="saveCurrentNote()">
+          <button class="btn-sec" onclick="deleteCurrentNote()" style="white-space:nowrap;">削除</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MUSIC SECTION ===== -->
+  <div id="music" class="section">
+    <div class="section-title">環境音 · AMBIENT MUSIC</div>
+
+    <div class="music-grid" id="musicGrid">
+      <div class="music-card" onclick="selectAmbient(this,'🌸','桜の雨','Sakura Rain')">
+        <span class="music-icon">🌸</span>
+        <div class="music-title">桜の雨</div>
+        <div class="music-sub">SAKURA RAIN</div>
+      </div>
+      <div class="music-card" onclick="selectAmbient(this,'🎐','竹林の風','Bamboo Wind')">
+        <span class="music-icon">🎐</span>
+        <div class="music-title">竹林の風</div>
+        <div class="music-sub">BAMBOO WIND</div>
+      </div>
+      <div class="music-card" onclick="selectAmbient(this,'🏯','城の静寂','Castle Silence')">
+        <span class="music-icon">🏯</span>
+        <div class="music-title">城の静寂</div>
+        <div class="music-sub">CASTLE SILENCE</div>
+      </div>
+      <div class="music-card" onclick="selectAmbient(this,'⛩','神社の朝','Shrine Morning')">
+        <span class="music-icon">⛩</span>
+        <div class="music-title">神社の朝</div>
+        <div class="music-sub">SHRINE MORNING</div>
+      </div>
+      <div class="music-card" onclick="selectAmbient(this,'🌊','海の波','Ocean Waves')">
+        <span class="music-icon">🌊</span>
+        <div class="music-title">海の波</div>
+        <div class="music-sub">OCEAN WAVES</div>
+      </div>
+      <div class="music-card" onclick="selectAmbient(this,'🌧','梅雨の雨','Rainy Season')">
+        <span class="music-icon">🌧</span>
+        <div class="music-title">梅雨の雨</div>
+        <div class="music-sub">RAINY SEASON</div>
+      </div>
+    </div>
+
+    <div class="ambient-player" id="ambientPlayer">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div class="sound-wave paused" id="soundWave">
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+        </div>
+        <div class="ambient-now">
+          <div class="ambient-name" id="ambientName">— 選択してください —</div>
+          <div class="ambient-type" id="ambientType">SELECT AMBIENT SOUND</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-end;">
+        <div class="volume-row">
+          <span class="volume-label">音量 VOL</span>
+          <input type="range" id="volSlider" min="0" max="100" value="60" oninput="updateVolumeBar(this)">
+          <span id="volVal" style="font-family:'Cinzel',serif;font-size:12px;color:var(--gold);min-width:28px;">60</span>
+        </div>
+        <button class="btn-main" id="playBtn" onclick="togglePlay()" style="padding:10px 28px;font-size:12px;">PLAY</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCHEDULE SECTION ===== -->
+  <div id="schedule" class="section">
+    <div class="section-title">学習スケジュール · STUDY SCHEDULE</div>
+
+    <div class="schedule-wrap">
+      <div class="calendar-panel">
+        <div class="cal-header">
+          <button class="cal-nav" onclick="changeMonth(-1)">◀</button>
+          <div class="cal-month" id="calMonth"></div>
+          <button class="cal-nav" onclick="changeMonth(1)">▶</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+
+      <div class="events-panel">
+        <div class="events-title" id="eventsTitle">本日の予定 · TODAY'S PLAN</div>
+        <div id="eventsList"></div>
+
+        <div class="add-event-form">
+          <input id="evtName" type="text" placeholder="授業名 / Subject name">
+          <input id="evtTime" type="time" value="09:00">
+          <select id="evtColor">
+            <option value="#c0607a">🌸 桜 Sakura</option>
+            <option value="#c9963a">🍂 金 Gold</option>
+            <option value="#5a7a4a">🍃 抹茶 Matcha</option>
+            <option value="#9b2335">🔴 紅 Crimson</option>
+            <option value="#4a6080">🌊 海 Ocean</option>
+          </select>
+          <button class="btn-main" onclick="addEvent()" style="clip-path:none;">予定を追加 + ADD EVENT</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    書斎 SHOSAI · Anime Study Room · 学ぶは一生 · Learning is Lifelong
+  </footer>
+</div>
+
+<script>
+// ===== PETALS =====
+(function() {
+  const container = document.getElementById('petals');
+  const symbols = ['🌸', '✿', '❀', '꽃'];
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.textContent = symbols[i % 4];
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.animationDuration = (8 + Math.random() * 12) + 's';
+    p.style.animationDelay = (Math.random() * 15) + 's';
+    p.style.fontSize = (10 + Math.random() * 10) + 'px';
+    container.appendChild(p);
+  }
+})();
+
+// ===== NAVIGATION =====
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('#mainNav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ===== TIMER =====
+let timerInterval = null;
+let timerTotal = 25 * 60;
+let timerLeft = timerTotal;
+let timerRunning = false;
+let sessionCount = 0;
+let currentMode = 'work';
+
+const quotes = [
+  '"七転び八起き — Fall seven times, stand up eight."',
+  '"努力は必ず報われる — Effort will always be rewarded."',
+  '"一期一会 — One time, one meeting. Treasure each moment."',
+  '"継続は力なり — Continuing on is power."',
+  '"知識は剣よりも鋭い — Knowledge is sharper than a sword."',
+];
+
+function setTimerMode(work, brk, jpLabel, enLabel, btn) {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  document.getElementById('startBtn').textContent = 'START';
+  document.querySelectorAll('.timer-mode button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  timerTotal = work * 60;
+  timerLeft = timerTotal;
+  document.getElementById('timerLabel').textContent = jpLabel + '時間 · ' + enLabel.toUpperCase();
+  updateTimerDisplay();
+  updateRing();
+}
+
+function toggleTimer() {
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('startBtn').textContent = 'RESUME';
+  } else {
+    timerRunning = true;
+    document.getElementById('startBtn').textContent = 'PAUSE';
+    timerInterval = setInterval(() => {
+      timerLeft--;
+      if (timerLeft <= 0) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        timerLeft = 0;
+        sessionCount++;
+        document.getElementById('sessionLog').textContent = '本日の作業 · ' + sessionCount + ' セッション完了';
+        document.getElementById('startBtn').textContent = 'START';
+        // cycle quote
+        document.getElementById('quoteText').textContent = quotes[sessionCount % quotes.length];
+      }
+      updateTimerDisplay();
+      updateRing();
+    }, 1000);
+  }
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerLeft = timerTotal;
+  document.getElementById('startBtn').textContent = 'START';
+  updateTimerDisplay();
+  updateRing();
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerLeft / 60).toString().padStart(2, '0');
+  const s = (timerLeft % 60).toString().padStart(2, '0');
+  document.getElementById('timerDisplay').textContent = m + ':' + s;
+}
+
+function updateRing() {
+  const circ = 2 * Math.PI * 88;
+  const pct = timerLeft / timerTotal;
+  const offset = circ * (1 - pct);
+  document.getElementById('ringProgress').style.strokeDasharray = circ;
+  document.getElementById('ringProgress').style.strokeDashoffset = offset;
+}
+
+updateTimerDisplay();
+updateRing();
+
+// ===== TASKS =====
+let tasks = JSON.parse(localStorage.getItem('shosai_tasks') || '[]');
+
+function saveTasks() {
+  localStorage.setItem('shosai_tasks', JSON.stringify(tasks));
+}
+
+function renderTasks() {
+  const active = tasks.filter(t => !t.done);
+  const done = tasks.filter(t => t.done);
+
+  const activeLi = active.map((t, i) => `
+    <li class="task-item" data-id="${t.id}">
+      <div class="task-check" onclick="toggleTask('${t.id}')"></div>
+      <span class="task-text">${escHtml(t.text)}</span>
+      <span class="priority ${t.priority}">${t.priority === 'high' ? '高' : t.priority === 'med' ? '中' : '低'}</span>
+      <button class="task-del" onclick="deleteTask('${t.id}')">✕</button>
+    </li>`).join('');
+
+  const doneLi = done.map(t => `
+    <li class="task-item done" data-id="${t.id}">
+      <div class="task-check" onclick="toggleTask('${t.id}')">✓</div>
+      <span class="task-text">${escHtml(t.text)}</span>
+      <button class="task-del" onclick="deleteTask('${t.id}')">✕</button>
+    </li>`).join('');
+
+  document.getElementById('taskList').innerHTML = activeLi || '<li style="padding:12px 0;color:var(--sakura);font-size:12px;font-family:Noto Serif JP;letter-spacing:2px;">課題なし · No tasks yet</li>';
+  document.getElementById('doneList').innerHTML = doneLi || '<li style="padding:8px 0;color:var(--sakura-light);font-size:12px;font-family:Noto Serif JP;letter-spacing:2px;">まだなし</li>';
+
+  const total = tasks.length;
+  const doneC = done.length;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statDone').textContent = doneC;
+  document.getElementById('statPct').textContent = total ? Math.round(doneC / total * 100) + '%' : '0%';
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function addTask() {
+  const text = document.getElementById('newTask').value.trim();
+  const priority = document.getElementById('taskPriority').value;
+  if (!text) return;
+  tasks.unshift({ id: Date.now().toString(), text, priority, done: false });
+  document.getElementById('newTask').value = '';
+  saveTasks();
+  renderTasks();
+}
+
+function toggleTask(id) {
+  const t = tasks.find(t => t.id === id);
+  if (t) { t.done = !t.done; saveTasks(); renderTasks(); }
+}
+
+function deleteTask(id) {
+  tasks = tasks.filter(t => t.id !== id);
+  saveTasks();
+  renderTasks();
+}
+
+renderTasks();
+
+// ===== NOTES =====
+let notes = JSON.parse(localStorage.getItem('shosai_notes') || '[]');
+let currentNoteId = null;
+
+function saveNotes() {
+  localStorage.setItem('shosai_notes', JSON.stringify(notes));
+}
+
+function renderNotesList() {
+  const list = document.getElementById('notesList');
+  if (!notes.length) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--sakura-light);padding:8px;font-family:Noto Serif JP;letter-spacing:2px;">ノートなし</div>';
+    return;
+  }
+  list.innerHTML = notes.map(n => `
+    <div class="note-item ${n.id === currentNoteId ? 'active' : ''}" onclick="openNote('${n.id}')">
+      <div class="note-item-title">${escHtml(n.title || '無題のノート')}</div>
+      <div class="note-item-date">${n.date} ${n.tag ? '· ' + n.tag : ''}</div>
+    </div>`).join('');
+}
+
+function openNote(id) {
+  currentNoteId = id;
+  const n = notes.find(n => n.id === id);
+  if (!n) return;
+  document.getElementById('noteTitleInput').value = n.title || '';
+  document.getElementById('noteBodyInput').value = n.body || '';
+  document.getElementById('noteTagInput').value = n.tag || '';
+  renderNotesList();
+}
+
+function newNote() {
+  const id = Date.now().toString();
+  const today = new Date().toLocaleDateString('ja-JP', {month:'short', day:'numeric'});
+  notes.unshift({ id, title: '', body: '', tag: '', date: today });
+  currentNoteId = id;
+  saveNotes();
+  renderNotesList();
+  openNote(id);
+  document.getElementById('noteTitleInput').focus();
+}
+
+function saveCurrentNote() {
+  if (!currentNoteId) return;
+  const n = notes.find(n => n.id === currentNoteId);
+  if (!n) return;
+  n.title = document.getElementById('noteTitleInput').value;
+  n.body  = document.getElementById('noteBodyInput').value;
+  n.tag   = document.getElementById('noteTagInput').value;
+  saveNotes();
+  renderNotesList();
+}
+
+function deleteCurrentNote() {
+  if (!currentNoteId) return;
+  notes = notes.filter(n => n.id !== currentNoteId);
+  currentNoteId = null;
+  document.getElementById('noteTitleInput').value = '';
+  document.getElementById('noteBodyInput').value = '';
+  document.getElementById('noteTagInput').value = '';
+  saveNotes();
+  renderNotesList();
+}
+
+// Create initial note if none exist
+if (!notes.length) {
+  const id = Date.now().toString();
+  notes.push({ id, title: '🌸 最初のノート', body: 'ようこそ書斎へ！\nここに学習ノートを書いていきましょう。\n\n• 授業のまとめ\n• 覚えるべき単語や公式\n• 問題の解き方', tag: '入門', date: '今日' });
+  currentNoteId = id;
+  saveNotes();
+}
+renderNotesList();
+openNote(currentNoteId || notes[0]?.id);
+
+// ===== MUSIC =====
+let currentCard = null;
+let isPlaying = false;
+
+function selectAmbient(card, icon, jp, en) {
+  document.querySelectorAll('.music-card').forEach(c => c.classList.remove('playing'));
+  card.classList.add('playing');
+  currentCard = card;
+  document.getElementById('ambientName').textContent = icon + ' ' + jp;
+  document.getElementById('ambientType').textContent = en.toUpperCase();
+  isPlaying = true;
+  document.getElementById('soundWave').classList.remove('paused');
+  document.getElementById('playBtn').textContent = 'PAUSE';
+}
+
+function togglePlay() {
+  if (!currentCard) return;
+  isPlaying = !isPlaying;
+  if (isPlaying) {
+    document.getElementById('soundWave').classList.remove('paused');
+    document.getElementById('playBtn').textContent = 'PAUSE';
+    currentCard.classList.add('playing');
+  } else {
+    document.getElementById('soundWave').classList.add('paused');
+    document.getElementById('playBtn').textContent = 'PLAY';
+    currentCard.classList.remove('playing');
+  }
+}
+
+function updateVolumeBar(input) {
+  const val = input.value;
+  document.getElementById('volVal').textContent = val;
+  input.style.background = `linear-gradient(90deg, var(--sakura-deep) ${val}%, var(--sakura-light) ${val}%)`;
+}
+
+// ===== CALENDAR =====
+let calDate = new Date();
+let events = JSON.parse(localStorage.getItem('shosai_events') || '{}');
+let selectedCalDate = new Date();
+
+function saveEvents() {
+  localStorage.setItem('shosai_events', JSON.stringify(events));
+}
+
+function formatDateKey(d) {
+  return d.getFullYear() + '-' + (d.getMonth()+1).toString().padStart(2,'0') + '-' + d.getDate().toString().padStart(2,'0');
+}
+
+function renderCalendar() {
+  const y = calDate.getFullYear(), m = calDate.getMonth();
+  const monthNames = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+  const dayNames = ['日','月','火','水','木','金','土'];
+
+  document.getElementById('calMonth').textContent = y + '年 ' + monthNames[m];
+
+  const first = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const prevDays = new Date(y, m, 0).getDate();
+  const today = new Date();
+
+  let html = dayNames.map(d => `<div class="cal-day-name">${d}</div>`).join('');
+
+  for (let i = 0; i < first; i++) {
+    const day = prevDays - first + i + 1;
+    html += `<div class="cal-day other-month">${day}</div>`;
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateKey = y + '-' + (m+1).toString().padStart(2,'0') + '-' + d.toString().padStart(2,'0');
+    const isToday = today.getDate() === d && today.getMonth() === m && today.getFullYear() === y;
+    const hasEv = events[dateKey] && events[dateKey].length;
+    html += `<div class="cal-day ${isToday ? 'today' : ''} ${hasEv ? 'has-event' : ''}" onclick="selectDay(${y},${m},${d})">${d}</div>`;
+  }
+
+  const remaining = 42 - first - daysInMonth;
+  for (let d = 1; d <= remaining; d++) {
+    html += `<div class="cal-day other-month">${d}</div>`;
+  }
+
+  document.getElementById('calGrid').innerHTML = html;
+  renderEvents();
+}
+
+function changeMonth(dir) {
+  calDate.setMonth(calDate.getMonth() + dir);
+  renderCalendar();
+}
+
+function selectDay(y, m, d) {
+  selectedCalDate = new Date(y, m, d);
+  renderEvents();
+}
+
+function renderEvents() {
+  const dateKey = formatDateKey(selectedCalDate);
+  const dayEvts = events[dateKey] || [];
+  const dateStr = selectedCalDate.toLocaleDateString('ja-JP', {month:'long', day:'numeric'});
+
+  document.getElementById('eventsTitle').textContent = dateStr + ' の予定';
+
+  if (!dayEvts.length) {
+    document.getElementById('eventsList').innerHTML = '<div style="font-size:12px;color:var(--sakura-light);padding:8px 0;font-family:Noto Serif JP;letter-spacing:2px;">予定なし · No events</div>';
+    return;
+  }
+
+  const sorted = [...dayEvts].sort((a,b) => a.time.localeCompare(b.time));
+  document.getElementById('eventsList').innerHTML = sorted.map(e => `
+    <div class="event-item">
+      <div class="event-dot" style="background:${e.color}"></div>
+      <div class="event-time">${e.time}</div>
+      <div class="event-info">
+        <div class="event-name">${escHtml(e.name)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function addEvent() {
+  const name = document.getElementById('evtName').value.trim();
+  const time = document.getElementById('evtTime').value;
+  const color = document.getElementById('evtColor').value;
+  if (!name) return;
+
+  const dateKey = formatDateKey(selectedCalDate);
+  if (!events[dateKey]) events[dateKey] = [];
+  events[dateKey].push({ name, time, color, id: Date.now().toString() });
+  saveEvents();
+  document.getElementById('evtName').value = '';
+  renderCalendar();
+}
+
+// init
+selectedCalDate = new Date();
+renderCalendar();
+</script>
+</body>
+</html>
